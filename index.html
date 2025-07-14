@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mohammed Munshid | Junior Python Developer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Teal & Gold Modern with Role-Specific Accents -->
+    <!-- Application Structure Plan: A single-page dashboard design is used to present the CV. It starts with a hero section for immediate impact (name, summary). A sticky navigation bar allows easy jumping between sections. The core of the page is a two-column layout: the left features a chronological, interactive timeline of experience, while the right sidebar contains filterable skills, a skill overview chart, and certifications. The key interaction is filtering: clicking a skill tag instantly highlights the relevant experiences in the timeline, allowing recruiters to quickly match skills to practical application. This non-linear, task-oriented structure is more efficient for a recruiter's workflow than a traditional linear document. -->
+    <!-- Visualization & Content Choices:
+        - Professional Summary (Inform) -> Styled Text Block -> Clear, immediate overview of his profile. The hero section now has a light background color for a vibrant feel.
+        - Skills (Organize/Relate) -> Filterable Buttons & Radar Chart (Chart.js) -> Buttons allow users to actively explore and connect skills to experience. The Radar chart provides a high-level visual summary of core competency areas (Backend, Cloud, etc.) for quick assessment. The entire section now has a distinct, energetic background color for enhanced vibrancy.
+        - Experience (Change/Inform) -> Interactive Vertical Timeline (HTML/CSS/JS) -> Shows career progression clearly. JS interaction highlights items based on the selected skill filter, directly demonstrating the "Goal: Relationships" principle. Each job role header now has a distinct background color for visual separation and vibrancy.
+        - Key Achievements (Inform/Compare) -> Statistic Cards (HTML/Tailwind) -> Pulls out quantifiable quantifiable achievements from the text, making his impact more tangible and impressive.
+        - Education/Certs (Inform) -> Styled Lists (HTML/Tailwind) -> Presents foundational information in a clean, easily scannable format. The certification section now includes Unicode icons for each provider, adding a colorful and recognizable visual element.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8; /* Softer, warmer off-white */
+            color: #333333; /* Dark charcoal for main text */
+        }
+        .skill-tag {
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Subtle shadow */
+        }
+        .skill-tag.selected {
+            background-color: #20B2AA !important; /* Vibrant Teal */
+            color: #ffffff !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(32, 178, 170, 0.3); /* Teal shadow */
+        }
+        .experience-card {
+            transition: all 0.3s ease-in-out;
+            border-left-width: 4px;
+            border-color: transparent;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* Subtle card shadow */
+        }
+        .experience-card.highlight {
+            border-color: #20B2AA; /* Teal highlight */
+            transform: scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(32, 178, 170, 0.1), 0 4px 6px -4px rgba(32, 178, 170, 0.08); /* Teal shadow on highlight */
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            top: 1rem;
+            left: -2.375rem;
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 9999px;
+            background-color: #A0D8D4; /* Lighter teal dot */
+            border: 4px solid #FDFBF8; /* Match body background */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .volunteering-item, .education-item, .certification-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        .volunteering-icon, .education-icon, .certification-icon {
+            font-size: 1.5rem;
+            margin-right: 0.75rem;
+            line-height: 1;
+        }
+
+        /* Role-specific header styles */
+        .role-header {
+            padding: 0.75rem 1.25rem;
+            margin: -1.5rem -1.5rem 1rem -1.5rem; /* Adjust to extend to card edges */
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+            color: #ffffff;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .role-header h3 {
+            margin: 0;
+            font-size: 1.25rem; /* Adjust as needed */
+        }
+        .role-header p {
+            margin: 0;
+            font-size: 0.875rem; /* Adjust as needed */
+        }
+
+        /* Specific role colors */
+        .role-junior-python { background-color: #3498db; } /* Blue */
+        .role-python-it { background-color: #27ae60; } /* Green */
+        .role-junior-software { background-color: #e67e22; } /* Orange */
+        .role-customer-team-leader { background-color: #9b59b6; } /* Purple */
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        <header id="about" class="text-center mb-12 scroll-mt-24 bg-teal-50 p-6 rounded-lg shadow-md border border-teal-100">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800">Mohammed Munshid</h1>
+            <p class="text-xl md:text-2xl text-teal-600 mt-2">Junior Python Developer</p>
+            <div class="mt-4 flex justify-center items-center gap-x-4 gap-y-2 flex-wrap text-gray-600">
+                <span>&#128205; Slough, United Kingdom</span>
+                <span>&#128231; <a href="mailto:munshidshand@gmail.com" class="hover:text-teal-600">munshidshand@gmail.com</a></span>
+                <span>&#128222; +44 7405 924152</span>
+                <span>&#128279; <a href="https://linkedin.com/in/munshid-python-developer" target="_blank" class="hover:text-teal-600">LinkedIn</a></span>
+                <span>&#128279; <a href="https://github.com/Munshidshaz" target="_blank" class="hover:text-teal-600">GitHub</a></span>
+            </div>
+            <p class="mt-6 max-w-3xl mx-auto text-gray-700 text-left md:text-center">
+                Junior Python Developer with a strong background in cybersecurity and hands-on experience in building, deploying, and optimizing real-world applications for SME and enterprise clients. Proven ability to work across cloud platforms, optimize database performance, and support operational systems. Passionate about scalable architectures, clean code, and making an impact in fast-moving teams.
+            </p>
+        </header>
+
+        <nav class="sticky top-0 bg-FDFBF8/80 backdrop-blur-md z-10 py-4 mb-12 border-b border-gray-200">
+            <ul class="flex justify-center gap-4 md:gap-8">
+                <li><a href="#experience" class="font-medium text-gray-600 hover:text-teal-600 transition-colors duration-200">Experience</a></li>
+                <li><a href="#skills" class="font-medium text-gray-600 hover:text-teal-600 transition-colors duration-200">Skills</a></li>
+                <li><a href="#education" class="font-medium text-gray-600 hover:text-teal-600 transition-colors duration-200">Education</a></li>
+                <li><a href="#certs" class="font-medium text-gray-600 hover:text-teal-600 transition-colors duration-200">Certifications</a></li>
+            </ul>
+        </nav>
+
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            
+            <section id="experience" class="lg:col-span-2 scroll-mt-24">
+                <h2 class="text-3xl font-bold text-gray-800 mb-8">Professional Experience</h2>
+                <div id="experience-timeline" class="relative pl-8 border-l-2 border-gray-200">
+                </div>
+            </section>
+
+            <aside id="skills" class="scroll-mt-24 bg-purple-50 p-6 rounded-lg shadow-md border border-purple-100">
+                <div class="sticky top-24">
+                    <h2 class="text-3xl font-bold text-purple-800 mb-6">Skills & Competencies</h2>
+                    <div class="mb-8 bg-white p-6 rounded-lg shadow-sm">
+                         <p class="mb-4 text-gray-600">This section provides a visual overview of my core technical strengths. The chart shows my relative proficiency across key development areas, while the tags below allow you to filter my work experience. Click a skill to see where I've applied it professionally.</p>
+                        <div class="chart-container">
+                            <canvas id="skillsChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-700 mb-4">Filter by Technology</h3>
+                        <div id="skill-tags" class="flex flex-wrap gap-2">
+                        </div>
+                    </div>
+
+                    <div id="certs" class="mt-12 scroll-mt-24 bg-blue-50 p-6 rounded-lg shadow-md border border-blue-100">
+                        <h2 class="text-2xl font-bold text-blue-800 mb-4">Certifications</h2>
+                        <ul id="cert-list" class="space-y-2 text-gray-700">
+                        </ul>
+                    </div>
+                </div>
+            </aside>
+
+        </main>
+
+        <section id="education" class="mt-16 scroll-mt-24">
+            <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Education & Volunteering</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div id="education-list" class="bg-orange-50 p-6 rounded-lg shadow-md border border-orange-100">
+                    <h3 class="text-xl font-bold text-orange-800 mb-4">Academic Background</h3>
+                </div>
+                <div id="volunteer-list" class="bg-teal-50 p-6 rounded-lg shadow-md border border-teal-100">
+                    <h3 class="text-xl font-bold text-teal-800 mb-4">Volunteering</h3>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        const cvData = {
+            professionalSummary: "Junior Python Developer with a strong background in cybersecurity and hands-on experience in building, deploying, and optimizing real-world applications for SME and enterprise clients. Proven ability to work across cloud platforms, optimize database performance, and support operational systems. Passionate about scalable architectures, clean code, and making an impact in fast-moving teams.",
+            skills: {
+                languages: ['Python', 'Bash', 'SQL'],
+                frameworks: ['Django', 'Flask', 'FastAPI'],
+                databases: ['Postgres', 'Redis'],
+                cloud: ['GCP', 'AWS', 'Azure'],
+                devops: ['Docker', 'Kubernetes', 'Prometheus', 'Linux', 'Git'],
+                tools: ['ServiceNow', 'Jira', 'prompt engineering']
+            },
+            experience: [
+                {
+                    role: 'Junior Python Developer',
+                    company: 'Axiata Digital Labs',
+                    period: 'Jan 2022 - Jan 2024',
+                    location: 'Colombo, Sri Lanka',
+                    details: [
+                        'Built an internal project management system using Django, deployed on GCP for 50 concurrent users.',
+                        'Resolved a high-priority production bug by removing database deadlocks with schema refactoring and stored procedures.',
+                        'Automated key database ops (vacuuming, indexing, archiving), improving query performance.'
+                    ],
+                    tags: ['Python', 'Django', 'GCP', 'Postgres', 'SQL']
+                },
+                {
+                    role: 'Python Developer/IT Support',
+                    company: '247 Techies',
+                    period: 'Jan 2022 - Jul 2022',
+                    location: 'Colombo, Sri Lanka',
+                    details: [
+                        'Created a backend monitoring app using Python and the Prometheus API, deployed on AWS ECS, reducing manual monitoring time by 50%.',
+                        'Built custom log parsing tools in Python for diagnosing CPU, memory, and disk I/O issues.',
+                        'Delivered remote IT support to international clients via Bomgar, achieving the highest client satisfaction rating.',
+                        'Enhanced backend system stability by implementing automated monitoring solutions.'
+                    ],
+                    tags: ['Python', 'Prometheus', 'AWS', 'Linux']
+                },
+                {
+                    role: 'Junior Software Developer',
+                    company: 'AJ Solutions',
+                    period: 'Aug 2020 - Aug 2021',
+                    location: 'Kandy, Sri Lanka',
+                    details: [
+                        'Maintained and enhanced legacy Flask and PHP systems for a retail client.',
+                        'Resolved database performance bottlenecks by implementing indexing and read replicas, reducing query response time by over 85%.',
+                        'Introduced asynchronous task processing for multi-store retail operations.'
+                    ],
+                    tags: ['Python', 'Flask', 'SQL', 'Postgres']
+                },
+                {
+                    role: 'Customer Team Leader',
+                    company: 'The Co-operative Group Retail',
+                    period: 'Sep 2024 - Present',
+                    location: 'London, UK',
+                    details: [
+                        'Led a team of 4 through peak periods (Christmas, bank holidays), balancing fast-paced operations with strong customer service.',
+                        'Fostered a collaborative, supportive culture that improved team performance under pressure.',
+                        'Coordinated daily team huddles to align on goals, enhancing communication and driving accountability.'
+                    ],
+                    tags: []
+                }
+            ],
+            education: [
+                {
+                    degree: 'MSc in Computer Networking and Cyber Security',
+                    university: 'London Metropolitan University',
+                    period: 'Jan 2014 - May 2015',
+                    result: 'Graduated with Distinction (GPA 3.95)',
+                    icon: '&#128218;' /* Open Book emoji */
+                },
+                {
+                    degree: 'BEng (Hons) in Computer Networking',
+                    university: 'London Metropolitan University',
+                    period: 'Jan 2020 - Aug 2025',
+                    result: 'Graduated with First Class Degree',
+                    icon: '&#128218;' /* Open Book emoji */
+                }
+            ],
+            certifications: [
+                { name: 'Google Cloud Certified Associate Cloud Engineer' },
+                { name: 'IT Support Certification | Google' },
+                { name: 'AWS Cloud Practitioner Essentials' },
+                { name: 'Certified Engineer - Multi-cloud Network Associate | Aviatrix' },
+                { name: 'Certified Kubernetes Administrator | KodeKloud' },
+                { name: 'Linux and Private Cloud Administration on IBM Power System' }
+            ],
+            volunteering: [
+                 {
+                    role: 'Volunteer Developer',
+                    organization: 'Code Your Future',
+                    location: 'Bedford Row, London',
+                    icon: '&#128187;', /* Laptop emoji */
+                    details: [
+                        'Assisted trainees in learning programming by guiding them through real-world projects.',
+                        'Conducted code reviews on GitHub to help trainees write cleaner, more efficient code.',
+                    ]
+                },
+                {
+                    role: 'Course Representative',
+                    organization: 'London Metropolitan University',
+                    location: 'Holloway, London',
+                    icon: '&#127891;', /* Graduation cap emoji */
+                    details: [
+                        'Represented a cohort of 30+ MSc students, acting as a bridge between students and faculty.',
+                        'Helped resolve 10+ student-raised issues, improving module satisfaction scores by 20%.',
+                    ]
+                },
+            ]
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const skillTagsContainer = document.getElementById('skill-tags');
+            const experienceTimelineContainer = document.getElementById('experience-timeline');
+            const educationContainer = document.getElementById('education-list');
+            const volunteerContainer = document.getElementById('volunteer-list');
+            const certContainer = document.getElementById('cert-list');
+
+            let allSkills = [];
+            Object.values(cvData.skills).forEach(cat => allSkills.push(...cat));
+            
+            allSkills.forEach(skill => {
+                const tag = document.createElement('button');
+                tag.className = 'skill-tag bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm font-medium hover:bg-gray-300';
+                tag.textContent = skill;
+                tag.dataset.skill = skill;
+                tag.addEventListener('click', () => toggleSkillFilter(skill));
+                skillTagsContainer.appendChild(tag);
+            });
+
+            cvData.experience.forEach(job => {
+                const jobCard = document.createElement('div');
+                jobCard.className = 'experience-card mb-8 relative bg-white p-6 rounded-lg shadow-sm';
+                jobCard.dataset.tags = JSON.stringify(job.tags);
+
+                // Determine role-specific class for header
+                let roleClass = '';
+                if (job.role === 'Junior Python Developer') {
+                    roleClass = 'role-junior-python';
+                } else if (job.role === 'Python Developer/IT Support') {
+                    roleClass = 'role-python-it';
+                } else if (job.role === 'Junior Software Developer') {
+                    roleClass = 'role-junior-software';
+                } else if (job.role === 'Customer Team Leader') {
+                    roleClass = 'role-customer-team-leader';
+                }
+
+                let detailsHtml = job.details.map(d => `<li class="text-gray-600">${d}</li>`).join('');
+
+                jobCard.innerHTML = `
+                    <div class="timeline-item">
+                        <div class="role-header ${roleClass}">
+                            <h3 class="text-white">${job.role}</h3>
+                            <p class="text-white text-sm">${job.period}</p>
+                        </div>
+                        <p class="font-semibold text-teal-600 mt-3">${job.company}</p>
+                        <p class="text-sm text-gray-500 mb-3">${job.location}</p>
+                        <ul class="list-disc list-inside space-y-2">
+                           ${detailsHtml}
+                        </ul>
+                    </div>
+                `;
+                experienceTimelineContainer.appendChild(jobCard);
+            });
+            
+            cvData.education.forEach(edu => {
+                const eduItem = document.createElement('div');
+                eduItem.className = 'education-item mb-4';
+                eduItem.innerHTML = `
+                    <span class="education-icon text-orange-600">${edu.icon}</span>
+                    <div>
+                        <p class="font-bold text-gray-800">${edu.degree}</p>
+                        <p class="text-gray-600">${edu.university}</p>
+                        <p class="text-sm text-gray-500">${edu.period}</p>
+                        <p class="text-sm text-orange-600 font-medium">${edu.result}</p>
+                    </div>
+                `;
+                educationContainer.appendChild(eduItem);
+            });
+
+            cvData.volunteering.forEach(vol => {
+                let detailsHtml = vol.details.map(d => `<li class="text-gray-600">${d}</li>`).join('');
+                const volItem = document.createElement('div');
+                volItem.className = 'volunteering-item mb-4';
+                volItem.innerHTML = `
+                    <span class="volunteering-icon text-teal-600">${vol.icon}</span>
+                    <div>
+                        <p class="font-bold text-gray-800">${vol.role}</p>
+                        <p class="text-gray-600">${vol.organization}</p>
+                        <p class="text-sm text-gray-500 mb-3">${vol.location}</p>
+                        <ul class="list-disc list-inside space-y-1 mt-1">
+                            ${detailsHtml}
+                        </ul>
+                    </div>
+                `;
+                volunteerContainer.appendChild(volItem);
+            });
+
+
+            cvData.certifications.forEach(cert => {
+                const certItem = document.createElement('li');
+                certItem.className = 'certification-item';
+                // Determine icon based on certification name
+                let icon = '';
+                if (cert.name.includes('Google Cloud') || cert.name.includes('Google')) {
+                    icon = '&#127760;'; // Globe with Meridians emoji (for Google Cloud/Google)
+                } else if (cert.name.includes('AWS')) {
+                    icon = '&#9729;&#xFE0F;'; // Cloud with Rain emoji (for AWS)
+                } else if (cert.name.includes('Aviatrix')) {
+                    icon = '&#128203;'; // Compass emoji (for Aviatrix)
+                } else if (cert.name.includes('Kubernetes') || cert.name.includes('KodeKloud')) {
+                    icon = '&#128737;&#xFE0F;'; // Gear emoji (for Kubernetes/KodeKloud)
+                } else if (cert.name.includes('Linux') || cert.name.includes('IBM')) {
+                    icon = '&#128421;&#xFE0F;'; // Desktop Computer emoji (for Linux/IBM)
+                } else {
+                    icon = '&#127891;'; // Default graduation cap
+                }
+                certItem.innerHTML = `<span class="certification-icon text-blue-600">${icon}</span> <span>${cert.name}</span>`;
+                certContainer.appendChild(certItem);
+            });
+
+            let selectedSkill = null;
+            function toggleSkillFilter(skill) {
+                const skillButton = document.querySelector(`.skill-tag[data-skill="${skill}"]`);
+                const allSkillButtons = document.querySelectorAll('.skill-tag');
+                
+                if (selectedSkill === skill) {
+                    selectedSkill = null;
+                    allSkillButtons.forEach(btn => btn.classList.remove('selected'));
+                } else {
+                    selectedSkill = skill;
+                    allSkillButtons.forEach(btn => btn.classList.remove('selected'));
+                    skillButton.classList.add('selected');
+                }
+                filterExperience();
+            }
+
+            function filterExperience() {
+                const experienceCards = document.querySelectorAll('.experience-card');
+                experienceCards.forEach(card => {
+                    if (!selectedSkill) {
+                        card.classList.remove('highlight');
+                        card.style.opacity = '1';
+                    } else {
+                        const tags = JSON.parse(card.dataset.tags);
+                        if (tags.includes(selectedSkill)) {
+                            card.classList.add('highlight');
+                            card.style.opacity = '1';
+                        } else {
+                            card.classList.remove('highlight');
+                            card.style.opacity = '0.4';
+                        }
+                    }
+                });
+            }
+            
+            const ctx = document.getElementById('skillsChart').getContext('2d');
+            const skillsChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Python Ecosystem', 'Cloud Platforms', 'Databases', 'DevOps Tools', 'Frontend Adj.'],
+                    datasets: [{
+                        label: 'Competency',
+                        data: [9, 8, 8, 7, 5],
+                        backgroundColor: 'rgba(32, 178, 170, 0.2)', /* Teal with transparency */
+                        borderColor: 'rgba(32, 178, 170, 1)', /* Solid Teal */
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(32, 178, 170, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(32, 178, 170, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                color: 'rgba(0, 0, 0, 0.08)' /* Lighter lines */
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.08)' /* Lighter grid */
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                },
+                                color: '#333333' /* Dark charcoal */
+                            },
+                            ticks: {
+                                beginAtZero: true,
+                                max: 10,
+                                stepSize: 2,
+                                backdropColor: 'rgba(253, 251, 248, 0.7)' /* Match new background */
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>
